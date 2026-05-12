@@ -13,14 +13,14 @@ export function SiteFooter() {
           Depois, se quiser, fale com nosso suporte pelo WhatsApp.
         </p>
         <SalesAssistantChat />
-        <Link
+        <a
           href={WHATSAPP_SUPPORT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-6 inline-flex rounded-md border border-green-500/50 bg-green-600/20 px-6 py-3 font-semibold text-green-300 transition hover:bg-green-600/30"
         >
           Tirar dúvidas pelo WhatsApp
-        </Link>
+        </a>
         <p className="mt-8 text-xs">
           Central de atendimento · Telefone{" "}
           <a href="tel:+5551982172731" className="text-gh-gold underline">
