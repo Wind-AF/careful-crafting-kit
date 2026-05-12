@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutUnitsRouteImport } from './routes/checkout.$units'
 import { Route as ApiWebhooksPagouRouteImport } from './routes/api/webhooks.pagou'
+import { Route as ApiWebhooksKirvuspayRouteImport } from './routes/api/webhooks.kirvuspay'
 import { Route as ApiPagouStatusRouteImport } from './routes/api/pagou.status'
 import { Route as ApiPagouCreatePixRouteImport } from './routes/api/pagou.create-pix'
 import { Route as ApiCheckoutUnitsRouteImport } from './routes/api/checkout.$units'
@@ -29,6 +30,11 @@ const CheckoutUnitsRoute = CheckoutUnitsRouteImport.update({
 const ApiWebhooksPagouRoute = ApiWebhooksPagouRouteImport.update({
   id: '/api/webhooks/pagou',
   path: '/api/webhooks/pagou',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksKirvuspayRoute = ApiWebhooksKirvuspayRouteImport.update({
+  id: '/api/webhooks/kirvuspay',
+  path: '/api/webhooks/kirvuspay',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPagouStatusRoute = ApiPagouStatusRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
   '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
   '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/kirvuspay': typeof ApiWebhooksKirvuspayRoute
   '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
   '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
   '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/kirvuspay': typeof ApiWebhooksKirvuspayRoute
   '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
   '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
   '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/kirvuspay': typeof ApiWebhooksKirvuspayRoute
   '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/api/checkout/$units'
     | '/api/pagou/create-pix'
     | '/api/pagou/status'
+    | '/api/webhooks/kirvuspay'
     | '/api/webhooks/pagou'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/api/checkout/$units'
     | '/api/pagou/create-pix'
     | '/api/pagou/status'
+    | '/api/webhooks/kirvuspay'
     | '/api/webhooks/pagou'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/api/checkout/$units'
     | '/api/pagou/create-pix'
     | '/api/pagou/status'
+    | '/api/webhooks/kirvuspay'
     | '/api/webhooks/pagou'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   ApiCheckoutUnitsRoute: typeof ApiCheckoutUnitsRoute
   ApiPagouCreatePixRoute: typeof ApiPagouCreatePixRoute
   ApiPagouStatusRoute: typeof ApiPagouStatusRoute
+  ApiWebhooksKirvuspayRoute: typeof ApiWebhooksKirvuspayRoute
   ApiWebhooksPagouRoute: typeof ApiWebhooksPagouRoute
 }
 
@@ -129,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/api/webhooks/pagou'
       fullPath: '/api/webhooks/pagou'
       preLoaderRoute: typeof ApiWebhooksPagouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/kirvuspay': {
+      id: '/api/webhooks/kirvuspay'
+      path: '/api/webhooks/kirvuspay'
+      fullPath: '/api/webhooks/kirvuspay'
+      preLoaderRoute: typeof ApiWebhooksKirvuspayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/pagou/status': {
@@ -161,8 +181,19 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCheckoutUnitsRoute: ApiCheckoutUnitsRoute,
   ApiPagouCreatePixRoute: ApiPagouCreatePixRoute,
   ApiPagouStatusRoute: ApiPagouStatusRoute,
+  ApiWebhooksKirvuspayRoute: ApiWebhooksKirvuspayRoute,
   ApiWebhooksPagouRoute: ApiWebhooksPagouRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
