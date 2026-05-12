@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type { Offer } from "@/lib/offers";
 
 type Props = {
@@ -15,17 +16,17 @@ export function CheckoutPageChrome({ offer, children }: Props) {
       <header className="sticky top-0 z-40 border-b border-white/10 bg-black/75 backdrop-blur-md">
         <div className="container-page flex max-w-6xl flex-wrap items-center justify-between gap-3 py-3 sm:py-4">
           <Link
-            href="/"
+            to="/"
             className="font-display text-xl tracking-wide text-gh-gold-bright sm:text-2xl"
           >
             GHDROL
           </Link>
-          <Link
+          <a
             href="/#oferta"
             className="text-xs uppercase tracking-wide text-gh-muted transition hover:text-white sm:text-sm"
           >
             ← Escolher outra oferta
-          </Link>
+          </a>
         </div>
       </header>
 
@@ -47,13 +48,10 @@ export function CheckoutPageChrome({ offer, children }: Props) {
 
               <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-10">
                 <div className="relative mx-auto aspect-square w-full max-w-[260px] shrink-0 sm:max-w-[300px] lg:mx-0 lg:max-w-[320px]">
-                  <Image
+                  <img
                     src={offer.image}
                     alt={offer.imageAlt}
-                    fill
-                    priority
-                    sizes="(max-width: 640px) 260px, (max-width: 1024px) 300px, 320px"
-                    className="object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.65)]"
+                    className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.65)]"
                   />
                 </div>
 
@@ -105,12 +103,12 @@ export function CheckoutPageChrome({ offer, children }: Props) {
           <aside className="order-1 lg:order-2 lg:sticky lg:top-24">{children}</aside>
         </div>
 
-        <Link
+        <a
           href="/#oferta"
           className="mt-10 block text-center text-sm text-gh-gold underline underline-offset-4 hover:text-gh-gold-bright"
         >
           ← Voltar para kits na página inicial
-        </Link>
+        </a>
       </div>
     </main>
   );
