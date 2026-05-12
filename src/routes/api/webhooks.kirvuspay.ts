@@ -6,12 +6,23 @@ import {
 
 /**
  * Webhook Kirvuspay — eventos TRANSACTION_CREATED / TRANSACTION_PAID / TRANSACTION_CANCELED.
- * Validamos o `token` recebido contra KIRVUSPAY_WEBHOOK_TOKEN (se configurado).
+ * Validação obrigatória do `token` contra KIRVUSPAY_WEBHOOK_TOKEN.
  */
 export const Route = createFileRoute("/api/webhooks/kirvuspay")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const expected = process.env.KIRVUSPAY_WEBHOOK_TOKEN?.trim();
+        if (!expected) {
+          console.error(
+            "[kirvuspay webhook] KIRVUSPAY_WEBHOOK_TOKEN não configurado — rejeitando.",
+          );
+          return Response.json(
+            { error: "webhook_not_configured" },
+            { status: 503 },
+          );
+        }
+
         let body: unknown;
         try {
           body = await request.json();
@@ -29,8 +40,11 @@ export const Route = createFileRoute("/api/webhooks/kirvuspay")({
           };
         };
 
-        const expected = process.env.KIRVUSPAY_WEBHOOK_TOKEN?.trim();
-        if (expected && payload.token !== expected) {
+        if (
+          typeof payload.token !== "string" ||
+          payload.token.length !== expected.length ||
+          payload.token !== expected
+        ) {
           return Response.json({ error: "invalid_token" }, { status: 401 });
         }
 
@@ -42,7 +56,6 @@ export const Route = createFileRoute("/api/webhooks/kirvuspay")({
           return Response.json({ error: "missing_transaction_id" }, { status: 400 });
         }
 
-        // Idempotência: usa identifier + event para diferenciar repetições.
         const eventKey = `${transactionId}:${event ?? "unknown"}`;
         if (await isWebhookEventProcessed(eventKey)) {
           return Response.json({ received: true, duplicate: true });

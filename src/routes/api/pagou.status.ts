@@ -1,44 +1,42 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  getPagouApiBase,
-  getPublicBaseUrl,
-  getWebhookNotifyUrl,
-  normalizePagouApiKey,
-  pagouEnvMismatchHints,
-  probePagouTransactionsList,
-} from "@/lib/pagou.server";
+import { hasKirvuspayConfigured } from "@/lib/kirvuspay.server";
 
+/**
+ * Endpoint de diagnóstico. Protegido por ADMIN_STATUS_TOKEN
+ * (header `x-admin-token` ou `Authorization: Bearer ...`).
+ * Não dispara chamadas externas para o gateway.
+ */
 export const Route = createFileRoute("/api/pagou/status")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const key = normalizePagouApiKey(process.env.PAGOU_API_KEY);
-        const hasKey = Boolean(key && key.length >= 12);
-        const url = new URL(request.url);
-        const probe = url.searchParams.get("probe") === "1" && Boolean(key);
-
-        let probeListTransactions: Awaited<
-          ReturnType<typeof probePagouTransactionsList>
-        > | null = null;
-        if (probe && key) {
-          probeListTransactions = await probePagouTransactionsList(key);
+        const expected = process.env.ADMIN_STATUS_TOKEN?.trim();
+        if (!expected) {
+          return Response.json(
+            { error: "status_endpoint_disabled" },
+            { status: 503 },
+          );
         }
 
-        const envHints = pagouEnvMismatchHints(key);
+        const auth = request.headers.get("authorization") ?? "";
+        const provided =
+          request.headers.get("x-admin-token")?.trim() ??
+          (auth.toLowerCase().startsWith("bearer ")
+            ? auth.slice(7).trim()
+            : "");
+
+        if (provided.length !== expected.length || provided !== expected) {
+          return Response.json({ error: "unauthorized" }, { status: 401 });
+        }
 
         return Response.json({
-          apiKeyLooksConfigured: hasKey,
-          envMismatchHints: envHints.length ? envHints : undefined,
-          authMode:
-            (process.env.PAGOU_AUTH_MODE ?? "bearer").toLowerCase().trim() ||
-            "bearer",
-          pagouEnv:
-            process.env.PAGOU_ENV === "production" ? "production" : "sandbox",
-          pagouApiBase: getPagouApiBase(),
-          publicBaseUrl: getPublicBaseUrl() ?? null,
-          notifyUrlFromEnv: getWebhookNotifyUrl() ?? null,
-          notifyWebhookPath: "/api/webhooks/pagou",
-          probeListTransactions,
+          gatewayConfigured: hasKirvuspayConfigured(),
+          webhookKirvuspayConfigured: Boolean(
+            process.env.KIRVUSPAY_WEBHOOK_TOKEN?.trim(),
+          ),
+          webhookPagouConfigured: Boolean(
+            process.env.PAGOU_WEBHOOK_SECRET?.trim(),
+          ),
         });
       },
     },

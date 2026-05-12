@@ -4,10 +4,39 @@ import {
   markOrderPaidFromWebhook,
 } from "@/lib/order-store.server";
 
+/**
+ * Webhook legado Pagou. Exige PAGOU_WEBHOOK_SECRET (Bearer ou header
+ * x-webhook-secret) para evitar que terceiros marquem pedidos como pagos.
+ */
 export const Route = createFileRoute("/api/webhooks/pagou")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const expected = process.env.PAGOU_WEBHOOK_SECRET?.trim();
+        if (!expected) {
+          console.error(
+            "[pagou webhook] PAGOU_WEBHOOK_SECRET não configurado — rejeitando.",
+          );
+          return Response.json(
+            { error: "webhook_not_configured" },
+            { status: 503 },
+          );
+        }
+
+        const auth = request.headers.get("authorization") ?? "";
+        const headerSecret =
+          request.headers.get("x-webhook-secret")?.trim() ??
+          (auth.toLowerCase().startsWith("bearer ")
+            ? auth.slice(7).trim()
+            : "");
+
+        if (
+          headerSecret.length !== expected.length ||
+          headerSecret !== expected
+        ) {
+          return Response.json({ error: "invalid_secret" }, { status: 401 });
+        }
+
         let body: unknown;
         try {
           body = await request.json();
