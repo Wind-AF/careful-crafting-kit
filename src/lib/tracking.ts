@@ -26,8 +26,16 @@ export function parseTrackingFromRequestBody(
   }
   const nested = body.tracking;
   if (nested && typeof nested === "object" && !Array.isArray(nested)) {
+    const allowed = new Set<string>(TRACKING_QUERY_KEYS);
     for (const [k, v] of Object.entries(nested)) {
-      if (typeof v === "string" && isSafeTrackingValue(v)) out[k] = v;
+      if (
+        allowed.has(k) &&
+        typeof v === "string" &&
+        isSafeTrackingValue(v) &&
+        !(k in out)
+      ) {
+        out[k] = v;
+      }
     }
   }
   return Object.keys(out).length ? out : undefined;
