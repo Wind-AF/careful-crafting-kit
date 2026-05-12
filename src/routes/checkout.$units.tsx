@@ -1,4 +1,5 @@
-import { createFileRoute, notFound, useServerFn } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { CheckoutPageChrome } from "@/components/checkout/CheckoutPageChrome";
 import { CheckoutFunnel } from "@/components/checkout/CheckoutFunnel";
