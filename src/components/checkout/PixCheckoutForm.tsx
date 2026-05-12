@@ -135,7 +135,7 @@ export function PixCheckoutForm({
           Pedido: {pix.external_ref} · Status: {pix.status}
         </p>
         <Link
-          href="/"
+          to="/"
           className="mt-6 inline-block text-sm text-gh-gold underline"
         >
           Voltar à página inicial
@@ -173,12 +173,12 @@ export function PixCheckoutForm({
             o link direto.
           </p>
         )}
-        <Link
+        <a
           href={`/api/checkout/${offer.units}`}
           className="mt-4 block text-center text-gh-gold underline"
         >
           Tentar redirecionamento interno (/api/checkout)
-        </Link>
+        </a>
       </div>
     );
   }
