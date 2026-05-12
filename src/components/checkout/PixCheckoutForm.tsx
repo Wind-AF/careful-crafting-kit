@@ -145,12 +145,16 @@ export function PixCheckoutForm({
         <label className="mt-6 block text-left text-xs uppercase tracking-wide text-gh-muted">
           Código copia e cola
         </label>
-        <textarea
-          readOnly
-          className="mt-1 h-24 w-full resize-none rounded border border-white/20 bg-black/50 p-3 font-mono text-[11px] text-gh-text"
-          value={pix.pix.qr_code}
-          onFocus={(e) => e.target.select()}
-        />
+        <div className="mt-1 truncate rounded border border-white/20 bg-black/50 p-3 font-mono text-[11px] text-gh-text">
+          {pix.pix.qr_code}
+        </div>
+        <button
+          type="button"
+          onClick={handleCopyPix}
+          className="mt-3 w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black transition-opacity hover:opacity-90"
+        >
+          {copied ? "Código copiado ✓" : "Copiar código Pix"}
+        </button>
         {pix.pix.expiration_date ? (
           <p className="mt-2 text-xs text-gh-muted">
             Expira em {new Date(pix.pix.expiration_date).toLocaleString("pt-BR")}
