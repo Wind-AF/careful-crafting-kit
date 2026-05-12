@@ -1,4 +1,4 @@
-
+import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 import { digitsOnly, isValidCPFDigits } from "@/lib/cpf";
@@ -31,15 +31,16 @@ export function PixCheckoutForm({
   onPixReady,
 }: Props) {
   const embed = variant === "embedded";
-  const sp = useSearchParams();
   const tracking = useMemo(() => {
+    if (typeof window === "undefined") return undefined;
+    const sp = new URLSearchParams(window.location.search);
     const out: Record<string, string> = {};
     for (const k of TRACKING_QUERY_KEYS) {
       const v = sp.get(k);
       if (v) out[k] = v;
     }
     return Object.keys(out).length ? out : undefined;
-  }, [sp]);
+  }, []);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
