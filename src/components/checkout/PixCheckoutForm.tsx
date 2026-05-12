@@ -49,6 +49,24 @@ export function PixCheckoutForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixPayload | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopyPix() {
+    if (!pix) return;
+    try {
+      await navigator.clipboard.writeText(pix.pix.qr_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = pix.pix.qr_code;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+      document.body.removeChild(ta);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
