@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutUnitsRouteImport } from './routes/checkout.$units'
+import { Route as ApiWebhooksPagouRouteImport } from './routes/api/webhooks.pagou'
+import { Route as ApiPagouStatusRouteImport } from './routes/api/pagou.status'
+import { Route as ApiPagouCreatePixRouteImport } from './routes/api/pagou.create-pix'
+import { Route as ApiCheckoutUnitsRouteImport } from './routes/api/checkout.$units'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +26,86 @@ const CheckoutUnitsRoute = CheckoutUnitsRouteImport.update({
   path: '/checkout/$units',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksPagouRoute = ApiWebhooksPagouRouteImport.update({
+  id: '/api/webhooks/pagou',
+  path: '/api/webhooks/pagou',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPagouStatusRoute = ApiPagouStatusRouteImport.update({
+  id: '/api/pagou/status',
+  path: '/api/pagou/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPagouCreatePixRoute = ApiPagouCreatePixRouteImport.update({
+  id: '/api/pagou/create-pix',
+  path: '/api/pagou/create-pix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutUnitsRoute = ApiCheckoutUnitsRouteImport.update({
+  id: '/api/checkout/$units',
+  path: '/api/checkout/$units',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/checkout/$units': typeof CheckoutUnitsRoute
+  '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
+  '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
+  '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checkout/$units': typeof CheckoutUnitsRoute
+  '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
+  '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
+  '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/checkout/$units': typeof CheckoutUnitsRoute
+  '/api/checkout/$units': typeof ApiCheckoutUnitsRoute
+  '/api/pagou/create-pix': typeof ApiPagouCreatePixRoute
+  '/api/pagou/status': typeof ApiPagouStatusRoute
+  '/api/webhooks/pagou': typeof ApiWebhooksPagouRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/checkout/$units'
+  fullPaths:
+    | '/'
+    | '/checkout/$units'
+    | '/api/checkout/$units'
+    | '/api/pagou/create-pix'
+    | '/api/pagou/status'
+    | '/api/webhooks/pagou'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/checkout/$units'
-  id: '__root__' | '/' | '/checkout/$units'
+  to:
+    | '/'
+    | '/checkout/$units'
+    | '/api/checkout/$units'
+    | '/api/pagou/create-pix'
+    | '/api/pagou/status'
+    | '/api/webhooks/pagou'
+  id:
+    | '__root__'
+    | '/'
+    | '/checkout/$units'
+    | '/api/checkout/$units'
+    | '/api/pagou/create-pix'
+    | '/api/pagou/status'
+    | '/api/webhooks/pagou'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckoutUnitsRoute: typeof CheckoutUnitsRoute
+  ApiCheckoutUnitsRoute: typeof ApiCheckoutUnitsRoute
+  ApiPagouCreatePixRoute: typeof ApiPagouCreatePixRoute
+  ApiPagouStatusRoute: typeof ApiPagouStatusRoute
+  ApiWebhooksPagouRoute: typeof ApiWebhooksPagouRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,13 +124,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutUnitsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/pagou': {
+      id: '/api/webhooks/pagou'
+      path: '/api/webhooks/pagou'
+      fullPath: '/api/webhooks/pagou'
+      preLoaderRoute: typeof ApiWebhooksPagouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pagou/status': {
+      id: '/api/pagou/status'
+      path: '/api/pagou/status'
+      fullPath: '/api/pagou/status'
+      preLoaderRoute: typeof ApiPagouStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pagou/create-pix': {
+      id: '/api/pagou/create-pix'
+      path: '/api/pagou/create-pix'
+      fullPath: '/api/pagou/create-pix'
+      preLoaderRoute: typeof ApiPagouCreatePixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/$units': {
+      id: '/api/checkout/$units'
+      path: '/api/checkout/$units'
+      fullPath: '/api/checkout/$units'
+      preLoaderRoute: typeof ApiCheckoutUnitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutUnitsRoute: CheckoutUnitsRoute,
+  ApiCheckoutUnitsRoute: ApiCheckoutUnitsRoute,
+  ApiPagouCreatePixRoute: ApiPagouCreatePixRoute,
+  ApiPagouStatusRoute: ApiPagouStatusRoute,
+  ApiWebhooksPagouRoute: ApiWebhooksPagouRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
