@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { OfferUnits } from "@/lib/checkout";
 import { digitsOnly, isValidCPFDigits } from "@/lib/cpf";
-import { createPixTransaction } from "@/lib/pagou.server";
+import { createKirvuspayPix, hasKirvuspayConfigured } from "@/lib/kirvuspay.server";
 import { savePendingOrder } from "@/lib/order-store.server";
 import { getOfferByUnits } from "@/lib/offers";
 import { parseTrackingFromRequestBody } from "@/lib/tracking";
@@ -16,6 +16,17 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        if (!hasKirvuspayConfigured()) {
+          return Response.json(
+            {
+              error: "Gateway não configurado",
+              detail:
+                "Defina KIRVUSPAY_PUBLIC_KEY e KIRVUSPAY_SECRET_KEY no ambiente.",
+            },
+            { status: 500 },
+          );
+        }
+
         let body: unknown;
         try {
           body = await request.json();
@@ -28,6 +39,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
           name?: string;
           email?: string;
           document?: string;
+          phone?: string;
         };
         const tracking = parseTrackingFromRequestBody(b);
 
@@ -37,33 +49,29 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
         const name = String(b.name ?? "").trim();
         const email = String(b.email ?? "").trim();
         const cpfDigits = digitsOnly(String(b.document ?? ""));
+        const phone = b.phone ? String(b.phone).trim() : undefined;
+
         if (name.length < 3) {
           return Response.json({ error: "Nome completo inválido" }, { status: 400 });
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           return Response.json({ error: "E-mail inválido" }, { status: 400 });
         }
-        if (cpfDigits.length !== 11) {
-          return Response.json({ error: "CPF inválido (11 dígitos)" }, { status: 400 });
-        }
-        if (!isValidCPFDigits(cpfDigits)) {
+        if (cpfDigits.length !== 11 || !isValidCPFDigits(cpfDigits)) {
           return Response.json(
-            {
-              error: "CPF inválido",
-              detail:
-                "Confira os dígitos do CPF. A Pagou recusa documentos com dígitos verificadores incorretos.",
-            },
+            { error: "CPF inválido", detail: "Confira os dígitos do CPF." },
             { status: 400 },
           );
         }
+
         const offer = getOfferByUnits(b.units);
         if (!offer) {
           return Response.json({ error: "Oferta não encontrada" }, { status: 400 });
         }
 
         try {
-          const result = await createPixTransaction(
-            { offer, buyer: { name, email, cpfDigits } },
+          const result = await createKirvuspayPix(
+            { offer, buyer: { name, email, cpfDigits }, phone },
             request,
           );
 
@@ -75,19 +83,15 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
                 : { error: String(raw) };
             if (result.status === 401 && !payload.detail) {
               payload.detail =
-                "Pagou recusou o token. Verifique PAGOU_API_KEY e se PAGOU_ENV (sandbox ou production) corresponde ao token no painel Pagou.";
-            }
-            if (result.status === 403 && !payload.detail) {
-              payload.detail =
-                "Acesso negado pela Pagou. Confira permissões da chave e se a conta está ativa.";
+                "Kirvuspay recusou as credenciais. Verifique KIRVUSPAY_PUBLIC_KEY e KIRVUSPAY_SECRET_KEY.";
             }
             return Response.json(payload, { status: result.status });
           }
 
           try {
             await savePendingOrder({
-              transactionId: result.id,
-              externalRef: result.externalRef,
+              transactionId: result.transactionId,
+              externalRef: result.identifier,
               units: b.units,
               email,
               name,
@@ -100,13 +104,16 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
           }
 
           return Response.json({
-            id: result.id,
+            id: result.transactionId,
             status: result.status,
             pix: {
               qr_code: result.qrCode,
-              expiration_date: result.expirationDate,
+              qr_base64: result.qrBase64,
+              qr_image: result.qrImage,
+              expiration_date: null,
             },
-            external_ref: result.externalRef,
+            external_ref: result.identifier,
+            order_url: result.orderUrl,
           });
         } catch (err) {
           console.error("[create-pix] unexpected:", err);
@@ -114,9 +121,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
             {
               error: "unexpected",
               detail:
-                err instanceof Error
-                  ? err.message
-                  : "Erro interno ao gerar o Pix.",
+                err instanceof Error ? err.message : "Erro interno ao gerar o Pix.",
             },
             { status: 500 },
           );
