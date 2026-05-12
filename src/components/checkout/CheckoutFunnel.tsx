@@ -1,4 +1,3 @@
-"use client";
 
 import { Suspense, useState } from "react";
 import { PixCheckoutForm } from "@/components/checkout/PixCheckoutForm";

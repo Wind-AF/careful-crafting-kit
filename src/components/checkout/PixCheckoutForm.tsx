@@ -1,7 +1,4 @@
-"use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 import { digitsOnly, isValidCPFDigits } from "@/lib/cpf";

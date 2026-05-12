@@ -1,5 +1,3 @@
-import Image from "next/image";
-import Link from "next/link";
 import type { Offer } from "@/lib/offers";
 
 type Props = {
