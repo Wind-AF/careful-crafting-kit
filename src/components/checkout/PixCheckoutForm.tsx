@@ -154,10 +154,10 @@ export function PixCheckoutForm({
         }
       >
         <p>
-          <strong className="text-white">Pagou API não configurada.</strong>{" "}
-          Defina <code className="text-gh-gold">PAGOU_API_KEY</code> no ambiente
-          (Vercel ou <code className="text-gh-gold">.env.local</code>) para gerar
-          Pix por aqui.
+          <strong className="text-white">Gateway Kirvuspay não configurado.</strong>{" "}
+          Defina <code className="text-gh-gold">KIRVUSPAY_PUBLIC_KEY</code> e{" "}
+          <code className="text-gh-gold">KIRVUSPAY_SECRET_KEY</code> no ambiente
+          para gerar Pix por aqui.
         </p>
         {hostedCheckoutUrl ? (
           <a
