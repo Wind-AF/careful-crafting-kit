@@ -78,13 +78,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "GHDROL — fórmula para performance física, massa muscular e resultados em semanas. Site oficial Ghmuscle.",
       },
-      { property: "og:title", content: "GHDROL — Oficial" },
+      { property: "og:title", content: "| GHDROL | OFICIAL | - Ghmuscle" },
       {
         property: "og:description",
         content: "Transformação corporal com a fórmula GHDROL. Brasil.",
       },
       { property: "og:locale", content: "pt_BR" },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "| GHDROL | OFICIAL | - Ghmuscle" },
+      { name: "description", content: "Gentle Guide facilitates secure API interactions with KirvusPay, enabling payment processing and transaction management." },
+      { property: "og:description", content: "Gentle Guide facilitates secure API interactions with KirvusPay, enabling payment processing and transaction management." },
+      { name: "twitter:description", content: "Gentle Guide facilitates secure API interactions with KirvusPay, enabling payment processing and transaction management." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2224d3ac-eb95-454c-b485-d54eda7ad58c/id-preview-638b5f66--f101b8c9-0727-4f28-870d-8ac7744e0e7d.lovable.app-1778616443540.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2224d3ac-eb95-454c-b485-d54eda7ad58c/id-preview-638b5f66--f101b8c9-0727-4f28-870d-8ac7744e0e7d.lovable.app-1778616443540.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
