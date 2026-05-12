@@ -37,7 +37,7 @@ export function Pricing() {
                 </span>
               ) : null}
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-                <Image
+                <img
                   src={o.image}
                   alt={o.imageAlt}
                   width={180}

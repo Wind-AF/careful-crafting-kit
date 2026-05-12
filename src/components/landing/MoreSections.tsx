@@ -101,12 +101,10 @@ export function BrandAuthoritySection() {
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12 lg:items-start">
           <article className="flex flex-col">
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 shadow-[0_12px_48px_rgba(0,0,0,0.35)] sm:aspect-[4/5]">
-              <Image
+              <img
                 src="/authority/fabrica-sede.png"
                 alt="Instalações Ghmuscle — equipa à frente da sede com fachada da marca"
-                fill
-                className="object-cover object-[center_30%] sm:object-center"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="absolute inset-0 h-full w-full object-cover object-[center_30%] sm:object-center"
               />
             </div>
             <h3 className="mt-5 font-display text-xl uppercase tracking-wide text-gh-gold-bright sm:text-2xl">
@@ -120,12 +118,10 @@ export function BrandAuthoritySection() {
           </article>
           <article className="flex flex-col">
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30 shadow-[0_12px_48px_rgba(0,0,0,0.35)] sm:aspect-[4/5]">
-              <Image
+              <img
                 src="/authority/frota-entrega.png"
                 alt="Veículo de entregas Ghmuscle — frota com identidade visual oficial"
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>
             <h3 className="mt-5 font-display text-xl uppercase tracking-wide text-gh-gold-bright sm:text-2xl">

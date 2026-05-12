@@ -65,12 +65,10 @@ export function Testimonials() {
               className={`flex flex-col items-center rounded-2xl border border-white/10 bg-gh-surface/70 px-5 pb-6 pt-8 text-center shadow-[0_8px_32px_rgba(0,0,0,0.35)] ${i === DEPOIMENTOS.length - 1 ? "lg:col-span-3 lg:mx-auto lg:max-w-sm" : ""}`}
             >
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-gh-gold/50 shadow-[0_0_24px_rgba(201,162,39,0.25)] sm:h-28 sm:w-28">
-                <Image
+                <img
                   src={d.src}
                   alt={d.alt}
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-width: 640px) 96px, 112px"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
                 />
               </div>
               <p className="mt-3 font-display text-lg uppercase tracking-wide text-gh-gold">

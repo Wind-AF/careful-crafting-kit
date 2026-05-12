@@ -95,14 +95,12 @@ export function WhatsAppPrintsCarousel() {
                 className="snap-center snap-always shrink-0 first:pl-[max(0px,calc(50%-11rem))] last:pr-[max(0px,calc(50%-11rem))] sm:first:pl-[max(0px,calc(50%-13rem))] sm:last:pr-[max(0px,calc(50%-13rem))]"
               >
                 <div className="relative w-[min(22rem,calc(100vw-2.5rem))] rounded-2xl border border-white/15 bg-black/40 shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-[26rem]">
-                  <Image
+                  <img
                     src={p.src}
                     alt={p.alt}
                     width={360}
                     height={640}
-                    sizes="(max-width: 640px) min(352px, 100vw) 416px"
                     className="block h-auto w-full rounded-2xl"
-                    unoptimized
                   />
                 </div>
               </div>
