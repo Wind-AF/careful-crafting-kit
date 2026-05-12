@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { OFFERS } from "@/lib/offers";
 import { CtaButton } from "./CtaButton";
 import { SectionTitle } from "./SectionTitle";

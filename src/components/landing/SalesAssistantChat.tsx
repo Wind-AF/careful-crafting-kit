@@ -1,4 +1,3 @@
-"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FAQ_ITEMS, matchFaqByKeywords, type FaqItem } from "@/data/faq-items";

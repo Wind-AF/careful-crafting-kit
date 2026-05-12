@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SalesAssistantChat } from "@/components/landing/SalesAssistantChat";
 import { WHATSAPP_SUPPORT_URL } from "@/lib/whatsapp-support";
 
