@@ -77,6 +77,7 @@ export function PixCheckoutForm({
           name,
           email,
           document: cpfInput,
+          phone: phoneDigits,
           ...(tracking ? { tracking } : {}),
         }),
       });
