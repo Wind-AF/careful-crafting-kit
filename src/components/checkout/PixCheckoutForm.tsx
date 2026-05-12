@@ -240,6 +240,18 @@ export function PixCheckoutForm({
         />
       </div>
       <div>
+        <label className="block text-xs uppercase text-gh-muted">Celular (com DDD)</label>
+        <input
+          required
+          inputMode="tel"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          autoComplete="tel"
+          placeholder="(11) 91234-5678"
+        />
+      </div>
+      <div>
         <label className="block text-xs uppercase text-gh-muted">CPF</label>
         <input
           required
