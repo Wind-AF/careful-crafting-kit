@@ -51,11 +51,15 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
         const cpfDigits = digitsOnly(String(b.document ?? ""));
         const phone = b.phone ? String(b.phone).trim() : undefined;
 
-        if (name.length < 3) {
+        if (name.length < 3 || name.length > 200) {
           return Response.json({ error: "Nome completo inválido" }, { status: 400 });
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           return Response.json({ error: "E-mail inválido" }, { status: 400 });
+        }
+        const phoneDigitsCheck = phone ? digitsOnly(phone) : "";
+        if (phone && (phone.length > 20 || phoneDigitsCheck.length < 10 || phoneDigitsCheck.length > 11)) {
+          return Response.json({ error: "Telefone inválido" }, { status: 400 });
         }
         if (cpfDigits.length !== 11 || !isValidCPFDigits(cpfDigits)) {
           return Response.json(
