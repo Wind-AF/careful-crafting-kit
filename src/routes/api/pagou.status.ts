@@ -26,7 +26,7 @@ export const Route = createFileRoute("/api/pagou/status")({
             ? auth.slice(7).trim()
             : "");
 
-        if (provided.length !== expected.length || provided !== expected) {
+        if (!timingSafeEqualStr(provided, expected)) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
 
