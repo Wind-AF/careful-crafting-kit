@@ -3,6 +3,7 @@ import {
   isWebhookEventProcessed,
   markOrderPaidFromWebhook,
 } from "@/lib/order-store.server";
+import { timingSafeEqualStr } from "@/lib/timing-safe.server";
 
 /**
  * Webhook legado Pagou. Exige PAGOU_WEBHOOK_SECRET (Bearer ou header
