@@ -3,6 +3,7 @@ import {
   isWebhookEventProcessed,
   markOrderPaidFromWebhook,
 } from "@/lib/order-store.server";
+import { timingSafeEqualStr } from "@/lib/timing-safe.server";
 
 /**
  * Webhook Kirvuspay — eventos TRANSACTION_CREATED / TRANSACTION_PAID / TRANSACTION_CANCELED.
