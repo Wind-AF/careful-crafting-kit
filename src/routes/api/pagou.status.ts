@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { hasKirvuspayConfigured } from "@/lib/kirvuspay.server";
+import { timingSafeEqualStr } from "@/lib/timing-safe.server";
 
 /**
  * Endpoint de diagnóstico. Protegido por ADMIN_STATUS_TOKEN
