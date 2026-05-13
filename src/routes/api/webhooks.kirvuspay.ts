@@ -43,8 +43,7 @@ export const Route = createFileRoute("/api/webhooks/kirvuspay")({
 
         if (
           typeof payload.token !== "string" ||
-          payload.token.length !== expected.length ||
-          payload.token !== expected
+          !timingSafeEqualStr(payload.token, expected)
         ) {
           return Response.json({ error: "invalid_token" }, { status: 401 });
         }
