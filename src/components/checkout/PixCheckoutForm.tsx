@@ -97,18 +97,13 @@ export function PixCheckoutForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const cpfDigits = digitsOnly(cpfInput);
-    if (cpfDigits.length !== 11) {
-      setError("CPF precisa ter 11 dígitos.");
-      return;
-    }
-    if (!isValidCPFDigits(cpfDigits)) {
-      setError("CPF inválido — verifique os dígitos antes de gerar o Pix.");
-      return;
-    }
-    const phoneDigits = digitsOnly(phone);
-    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
-      setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+    setTouched({ name: true, email: true, cpf: true, phone: true });
+    if (!formValid) {
+      if (!nameValid) setError("Informe o nome completo.");
+      else if (!emailValid) setError("E-mail inválido.");
+      else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
+      else if (!phoneValid)
+        setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
       return;
     }
     setLoading(true);
@@ -118,9 +113,9 @@ export function PixCheckoutForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           units: offer.units,
-          name,
-          email,
-          document: cpfInput,
+          name: name.trim(),
+          email: email.trim(),
+          document: cpfDigits,
           phone: phoneDigits,
           ...(tracking ? { tracking } : {}),
         }),
