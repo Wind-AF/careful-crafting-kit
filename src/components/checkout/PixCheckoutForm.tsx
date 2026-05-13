@@ -50,6 +50,32 @@ export function PixCheckoutForm({
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixPayload | null>(null);
   const [copied, setCopied] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  function formatCpf(v: string) {
+    const d = digitsOnly(v).slice(0, 11);
+    return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  }
+
+  function formatPhone(v: string) {
+    const d = digitsOnly(v).slice(0, 11);
+    if (d.length <= 2) return d.length ? `(${d}` : d;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10)
+      return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  }
+
+  const cpfDigits = digitsOnly(cpfInput);
+  const phoneDigits = digitsOnly(phone);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const nameValid = name.trim().length >= 3;
+  const cpfValid = cpfDigits.length === 11 && isValidCPFDigits(cpfDigits);
+  const phoneValid = phoneDigits.length === 10 || phoneDigits.length === 11;
+  const formValid = nameValid && emailValid && cpfValid && phoneValid;
 
   async function handleCopyPix() {
     if (!pix) return;
