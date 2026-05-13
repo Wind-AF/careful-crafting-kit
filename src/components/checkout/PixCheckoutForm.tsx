@@ -50,6 +50,32 @@ export function PixCheckoutForm({
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixPayload | null>(null);
   const [copied, setCopied] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  function formatCpf(v: string) {
+    const d = digitsOnly(v).slice(0, 11);
+    return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  }
+
+  function formatPhone(v: string) {
+    const d = digitsOnly(v).slice(0, 11);
+    if (d.length <= 2) return d.length ? `(${d}` : d;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10)
+      return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  }
+
+  const cpfDigits = digitsOnly(cpfInput);
+  const phoneDigits = digitsOnly(phone);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const nameValid = name.trim().length >= 3;
+  const cpfValid = cpfDigits.length === 11 && isValidCPFDigits(cpfDigits);
+  const phoneValid = phoneDigits.length === 10 || phoneDigits.length === 11;
+  const formValid = nameValid && emailValid && cpfValid && phoneValid;
 
   async function handleCopyPix() {
     if (!pix) return;
@@ -71,18 +97,13 @@ export function PixCheckoutForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const cpfDigits = digitsOnly(cpfInput);
-    if (cpfDigits.length !== 11) {
-      setError("CPF precisa ter 11 dígitos.");
-      return;
-    }
-    if (!isValidCPFDigits(cpfDigits)) {
-      setError("CPF inválido — verifique os dígitos antes de gerar o Pix.");
-      return;
-    }
-    const phoneDigits = digitsOnly(phone);
-    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
-      setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+    setTouched({ name: true, email: true, cpf: true, phone: true });
+    if (!formValid) {
+      if (!nameValid) setError("Informe o nome completo.");
+      else if (!emailValid) setError("E-mail inválido.");
+      else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
+      else if (!phoneValid)
+        setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
       return;
     }
     setLoading(true);
@@ -92,9 +113,9 @@ export function PixCheckoutForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           units: offer.units,
-          name,
-          email,
-          document: cpfInput,
+          name: name.trim(),
+          email: email.trim(),
+          document: cpfDigits,
           phone: phoneDigits,
           ...(tracking ? { tracking } : {}),
         }),
@@ -247,8 +268,12 @@ export function PixCheckoutForm({
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, name: true }))}
           autoComplete="name"
         />
+        {touched.name && !nameValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe seu nome completo.</p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">E-mail</label>
@@ -258,8 +283,12 @@ export function PixCheckoutForm({
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, email: true }))}
           autoComplete="email"
         />
+        {touched.email && !emailValid ? (
+          <p className="mt-1 text-xs text-red-300">E-mail inválido.</p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">Celular (com DDD)</label>
@@ -268,10 +297,17 @@ export function PixCheckoutForm({
           inputMode="tel"
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setPhone(formatPhone(e.target.value))}
+          onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
           autoComplete="tel"
           placeholder="(11) 91234-5678"
+          maxLength={16}
         />
+        {touched.phone && !phoneValid ? (
+          <p className="mt-1 text-xs text-red-300">
+            Telefone deve ter DDD + número (10 ou 11 dígitos).
+          </p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">CPF</label>
@@ -280,15 +316,21 @@ export function PixCheckoutForm({
           inputMode="numeric"
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={cpfInput}
-          onChange={(e) => setCpfInput(e.target.value)}
+          onChange={(e) => setCpfInput(formatCpf(e.target.value))}
+          onBlur={() => setTouched((t) => ({ ...t, cpf: true }))}
           autoComplete="off"
           placeholder="000.000.000-00"
+          maxLength={14}
         />
-        <p className="mt-1 text-xs text-gh-muted">
-          Use um CPF válido com{" "}
-          <strong className="text-white/90">11 dígitos</strong> (pontuação é
-          ignorada).
-        </p>
+        {touched.cpf && !cpfValid ? (
+          <p className="mt-1 text-xs text-red-300">
+            CPF inválido — confira os 11 dígitos.
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-gh-muted">
+            Use um CPF válido com 11 dígitos (a pontuação é preenchida automaticamente).
+          </p>
+        )}
       </div>
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
@@ -297,11 +339,16 @@ export function PixCheckoutForm({
       ) : null}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black disabled:opacity-50"
+        disabled={loading || !formValid}
+        className="w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Gerando Pix…" : "Gerar QR Pix"}
       </button>
+      {!formValid ? (
+        <p className="text-center text-[11px] text-gh-muted">
+          Preencha todos os campos corretamente para liberar o botão.
+        </p>
+      ) : null}
     </form>
   );
 }
