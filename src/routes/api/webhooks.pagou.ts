@@ -31,10 +31,7 @@ export const Route = createFileRoute("/api/webhooks/pagou")({
             ? auth.slice(7).trim()
             : "");
 
-        if (
-          headerSecret.length !== expected.length ||
-          headerSecret !== expected
-        ) {
+        if (!timingSafeEqualStr(headerSecret, expected)) {
           return Response.json({ error: "invalid_secret" }, { status: 401 });
         }
 
