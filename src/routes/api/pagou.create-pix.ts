@@ -76,14 +76,31 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
           );
 
           if (!result.ok) {
+            console.error("[create-pix] kirvuspay error:", result.status, result.body);
+            // Only forward user-actionable info for 4xx; mask 5xx internals.
+            if (result.status >= 500) {
+              return Response.json(
+                { error: "gateway_unavailable", detail: "Erro interno. Tente novamente." },
+                { status: 502 },
+              );
+            }
             const raw = result.body;
-            const payload: Record<string, unknown> =
+            const rawObj =
               raw !== null && typeof raw === "object" && !Array.isArray(raw)
-                ? { ...(raw as Record<string, unknown>) }
-                : { error: String(raw) };
-            if (result.status === 401 && !payload.detail) {
+                ? (raw as Record<string, unknown>)
+                : null;
+            // Extract a user-safe message only — not the full upstream body.
+            const safeMsg =
+              (rawObj?.message as string | undefined) ||
+              (rawObj?.error as string | undefined) ||
+              (Array.isArray((rawObj as { errors?: { message?: string }[] } | null)?.errors)
+                ? ((rawObj as { errors?: { message?: string }[] }).errors?.[0]?.message)
+                : undefined) ||
+              "Não foi possível gerar o Pix. Verifique os dados informados.";
+            const payload: Record<string, unknown> = { error: safeMsg, detail: safeMsg };
+            if (result.status === 401) {
               payload.detail =
-                "Kirvuspay recusou as credenciais. Verifique KIRVUSPAY_PUBLIC_KEY e KIRVUSPAY_SECRET_KEY.";
+                "Gateway recusou as credenciais. Contate o suporte.";
             }
             return Response.json(payload, { status: result.status });
           }
@@ -118,11 +135,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
         } catch (err) {
           console.error("[create-pix] unexpected:", err);
           return Response.json(
-            {
-              error: "unexpected",
-              detail:
-                err instanceof Error ? err.message : "Erro interno ao gerar o Pix.",
-            },
+            { error: "unexpected", detail: "Erro interno. Tente novamente." },
             { status: 500 },
           );
         }

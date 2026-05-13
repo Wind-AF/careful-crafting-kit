@@ -101,13 +101,11 @@ export async function createKirvuspayPix(
       body: JSON.stringify(body),
     });
   } catch (err) {
+    console.error("[kirvuspay] network error:", err);
     return {
       ok: false,
       status: 502,
-      body: {
-        error: "network_error",
-        detail: err instanceof Error ? err.message : String(err),
-      },
+      body: { error: "network_error" },
     };
   }
 

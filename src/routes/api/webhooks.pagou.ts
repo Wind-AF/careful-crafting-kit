@@ -3,6 +3,7 @@ import {
   isWebhookEventProcessed,
   markOrderPaidFromWebhook,
 } from "@/lib/order-store.server";
+import { timingSafeEqualStr } from "@/lib/timing-safe.server";
 
 /**
  * Webhook legado Pagou. Exige PAGOU_WEBHOOK_SECRET (Bearer ou header
@@ -30,10 +31,7 @@ export const Route = createFileRoute("/api/webhooks/pagou")({
             ? auth.slice(7).trim()
             : "");
 
-        if (
-          headerSecret.length !== expected.length ||
-          headerSecret !== expected
-        ) {
+        if (!timingSafeEqualStr(headerSecret, expected)) {
           return Response.json({ error: "invalid_secret" }, { status: 401 });
         }
 

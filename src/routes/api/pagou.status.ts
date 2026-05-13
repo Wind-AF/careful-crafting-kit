@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { hasKirvuspayConfigured } from "@/lib/kirvuspay.server";
+import { timingSafeEqualStr } from "@/lib/timing-safe.server";
 
 /**
  * Endpoint de diagnóstico. Protegido por ADMIN_STATUS_TOKEN
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/api/pagou/status")({
             ? auth.slice(7).trim()
             : "");
 
-        if (provided.length !== expected.length || provided !== expected) {
+        if (!timingSafeEqualStr(provided, expected)) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
 
