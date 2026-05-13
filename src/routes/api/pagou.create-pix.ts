@@ -135,11 +135,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
         } catch (err) {
           console.error("[create-pix] unexpected:", err);
           return Response.json(
-            {
-              error: "unexpected",
-              detail:
-                err instanceof Error ? err.message : "Erro interno ao gerar o Pix.",
-            },
+            { error: "unexpected", detail: "Erro interno. Tente novamente." },
             { status: 500 },
           );
         }
