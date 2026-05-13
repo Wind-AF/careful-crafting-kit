@@ -268,8 +268,12 @@ export function PixCheckoutForm({
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, name: true }))}
           autoComplete="name"
         />
+        {touched.name && !nameValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe seu nome completo.</p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">E-mail</label>
@@ -279,8 +283,12 @@ export function PixCheckoutForm({
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, email: true }))}
           autoComplete="email"
         />
+        {touched.email && !emailValid ? (
+          <p className="mt-1 text-xs text-red-300">E-mail inválido.</p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">Celular (com DDD)</label>
@@ -289,10 +297,17 @@ export function PixCheckoutForm({
           inputMode="tel"
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setPhone(formatPhone(e.target.value))}
+          onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
           autoComplete="tel"
           placeholder="(11) 91234-5678"
+          maxLength={16}
         />
+        {touched.phone && !phoneValid ? (
+          <p className="mt-1 text-xs text-red-300">
+            Telefone deve ter DDD + número (10 ou 11 dígitos).
+          </p>
+        ) : null}
       </div>
       <div>
         <label className="block text-xs uppercase text-gh-muted">CPF</label>
@@ -301,15 +316,21 @@ export function PixCheckoutForm({
           inputMode="numeric"
           className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
           value={cpfInput}
-          onChange={(e) => setCpfInput(e.target.value)}
+          onChange={(e) => setCpfInput(formatCpf(e.target.value))}
+          onBlur={() => setTouched((t) => ({ ...t, cpf: true }))}
           autoComplete="off"
           placeholder="000.000.000-00"
+          maxLength={14}
         />
-        <p className="mt-1 text-xs text-gh-muted">
-          Use um CPF válido com{" "}
-          <strong className="text-white/90">11 dígitos</strong> (pontuação é
-          ignorada).
-        </p>
+        {touched.cpf && !cpfValid ? (
+          <p className="mt-1 text-xs text-red-300">
+            CPF inválido — confira os 11 dígitos.
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-gh-muted">
+            Use um CPF válido com 11 dígitos (a pontuação é preenchida automaticamente).
+          </p>
+        )}
       </div>
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
@@ -318,11 +339,16 @@ export function PixCheckoutForm({
       ) : null}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black disabled:opacity-50"
+        disabled={loading || !formValid}
+        className="w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Gerando Pix…" : "Gerar QR Pix"}
       </button>
+      {!formValid ? (
+        <p className="text-center text-[11px] text-gh-muted">
+          Preencha todos os campos corretamente para liberar o botão.
+        </p>
+      ) : null}
     </form>
   );
 }
