@@ -51,6 +51,8 @@ export function CheckoutPageChrome({ offer, children }: Props) {
                   <img
                     src={offer.image}
                     alt={offer.imageAlt}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 h-full w-full object-contain drop-shadow-[0_12px_40px_rgba(0,0,0,0.65)]"
                   />
                 </div>

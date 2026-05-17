@@ -8,6 +8,9 @@ export function Hero() {
         <img
           src="/hero/ghdrol-produto.png"
           alt="GHDROL — frasco do suplemento"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-[50%_35%] sm:object-[58%_center] md:object-[62%_center] lg:object-[65%_center] md:scale-[1.02]"
         />
       </div>

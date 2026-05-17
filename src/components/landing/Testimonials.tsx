@@ -68,6 +68,10 @@ export function Testimonials() {
                 <img
                   src={d.src}
                   alt={d.alt}
+                  loading="lazy"
+                  decoding="async"
+                  width={112}
+                  height={112}
                   className="absolute inset-0 h-full w-full object-cover object-top"
                 />
               </div>

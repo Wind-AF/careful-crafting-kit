@@ -104,6 +104,8 @@ export function BrandAuthoritySection() {
               <img
                 src="/authority/fabrica-sede.png"
                 alt="Instalações Ghmuscle — equipa à frente da sede com fachada da marca"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover object-[center_30%] sm:object-center"
               />
             </div>
@@ -121,6 +123,8 @@ export function BrandAuthoritySection() {
               <img
                 src="/authority/frota-entrega.png"
                 alt="Veículo de entregas Ghmuscle — frota com identidade visual oficial"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>

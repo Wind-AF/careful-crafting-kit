@@ -42,6 +42,8 @@ export function Pricing() {
                   alt={o.imageAlt}
                   width={180}
                   height={180}
+                  loading="lazy"
+                  decoding="async"
                   className="h-40 w-40 shrink-0 object-contain"
                 />
                 <div className="flex-1 text-center sm:text-left">
