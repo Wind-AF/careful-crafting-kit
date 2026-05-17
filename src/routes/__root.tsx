@@ -71,7 +71,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#020202" },
+      { name: "format-detection", content: "telephone=no" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { title: "| GHDROL | OFICIAL | - Ghmuscle" },
       {
         name: "description",
@@ -95,6 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "preload", as: "image", href: "/hero/ghdrol-produto.png", fetchpriority: "high" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       {
         rel: "preconnect",

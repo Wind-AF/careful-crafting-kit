@@ -100,6 +100,8 @@ export function WhatsAppPrintsCarousel() {
                     alt={p.alt}
                     width={360}
                     height={640}
+                    loading="lazy"
+                    decoding="async"
                     className="block h-auto w-full rounded-2xl"
                   />
                 </div>
