@@ -28,7 +28,7 @@ export function CheckoutFunnel({
       <CheckoutUrgencyBanner offer={offer} />
       <CheckoutStepIndicators phase={phase} />
 
-      <div className="rounded-2xl border border-gh-gold/35 bg-gradient-to-b from-gh-surface/95 to-black/90 p-6 shadow-[0_16px_48px_rgba(0,0,0,0.45)] sm:p-7">
+      <div className="rounded-2xl border border-gh-gold/35 bg-gradient-to-b from-gh-surface/95 to-black/90 p-4 shadow-[0_16px_48px_rgba(0,0,0,0.45)] sm:p-7">
         <h3 className="border-b border-white/10 pb-4 text-center font-display text-xl uppercase tracking-wide text-white">
           Resumo do pedido
         </h3>

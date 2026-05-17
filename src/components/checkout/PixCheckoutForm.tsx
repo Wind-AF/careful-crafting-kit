@@ -150,8 +150,8 @@ export function PixCheckoutForm({
       <div
         className={
           embed
-            ? "rounded-xl border border-gh-gold/40 bg-black/40 p-5 text-center sm:p-6"
-            : "rounded-xl border border-gh-gold/40 bg-gh-surface/90 p-6 text-center"
+            ? "rounded-xl border border-gh-gold/40 bg-black/40 p-4 text-center sm:p-6"
+            : "rounded-xl border border-gh-gold/40 bg-gh-surface/90 p-4 text-center sm:p-6"
         }
       >
         <h2 className="font-display text-2xl uppercase text-gh-gold-bright">
@@ -160,19 +160,26 @@ export function PixCheckoutForm({
         <p className="mt-2 text-sm text-gh-muted">
           Escaneie o QR no app do banco ou copie o código Pix abaixo.
         </p>
-        <div className="mx-auto mt-6 flex justify-center rounded-lg bg-white p-4">
-          <QRCode value={pix.pix.qr_code} size={200} />
+        <div className="mx-auto mt-6 flex w-full max-w-[260px] justify-center rounded-lg bg-white p-3 sm:max-w-[280px] sm:p-4">
+          <div className="aspect-square w-full">
+            <QRCode
+              value={pix.pix.qr_code}
+              size={256}
+              style={{ height: "100%", width: "100%" }}
+              viewBox="0 0 256 256"
+            />
+          </div>
         </div>
         <label className="mt-6 block text-left text-xs uppercase tracking-wide text-gh-muted">
           Código copia e cola
         </label>
-        <div className="mt-1 truncate rounded border border-white/20 bg-black/50 p-3 font-mono text-[11px] text-gh-text">
+        <div className="mt-1 max-h-28 overflow-y-auto rounded border border-white/20 bg-black/50 p-3 text-left font-mono text-xs leading-relaxed text-gh-text break-all">
           {pix.pix.qr_code}
         </div>
         <button
           type="button"
           onClick={handleCopyPix}
-          className="mt-3 w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black transition-opacity hover:opacity-90"
+          className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black transition-opacity hover:opacity-90"
         >
           {copied ? "Código copiado ✓" : "Copiar código Pix"}
         </button>
@@ -239,7 +246,7 @@ export function PixCheckoutForm({
       className={
         embed
           ? "space-y-4 border-t border-white/10 pt-6"
-          : "space-y-4 rounded-xl border border-white/10 bg-gh-surface/80 p-6"
+          : "space-y-4 rounded-xl border border-white/10 bg-gh-surface/80 p-4 sm:p-6"
       }
     >
       <h2 className="font-display text-xl uppercase text-white sm:text-2xl">
@@ -265,7 +272,7 @@ export function PixCheckoutForm({
         </label>
         <input
           required
-          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={() => setTouched((t) => ({ ...t, name: true }))}
@@ -280,7 +287,11 @@ export function PixCheckoutForm({
         <input
           required
           type="email"
-          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
+          inputMode="email"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onBlur={() => setTouched((t) => ({ ...t, email: true }))}
@@ -295,7 +306,7 @@ export function PixCheckoutForm({
         <input
           required
           inputMode="tel"
-          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
           value={phone}
           onChange={(e) => setPhone(formatPhone(e.target.value))}
           onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
@@ -314,7 +325,7 @@ export function PixCheckoutForm({
         <input
           required
           inputMode="numeric"
-          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-2 text-gh-text"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
           value={cpfInput}
           onChange={(e) => setCpfInput(formatCpf(e.target.value))}
           onBlur={() => setTouched((t) => ({ ...t, cpf: true }))}
@@ -340,7 +351,7 @@ export function PixCheckoutForm({
       <button
         type="submit"
         disabled={loading || !formValid}
-        className="w-full rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Gerando Pix…" : "Gerar QR Pix"}
       </button>
