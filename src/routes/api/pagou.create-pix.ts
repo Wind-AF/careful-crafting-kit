@@ -148,6 +148,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
               name,
               amountCents: offer.amountCents,
               createdAt: new Date().toISOString(),
+              address,
               ...(tracking ? { tracking } : {}),
             });
           } catch (persistErr) {
