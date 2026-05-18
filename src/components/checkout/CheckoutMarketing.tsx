@@ -2,13 +2,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Offer } from "@/lib/offers";
 
-type Phase = "data" | "payment";
+type Phase = "data" | "address" | "payment";
 
 type Props = {
   phase: Phase;
 };
 
-/** Etapas estilo checkout clássico: dados → entrega (info) → pagamento Pix */
+/** Etapas estilo checkout clássico: dados → entrega → pagamento Pix */
 export function CheckoutStepIndicators({ phase }: Props) {
   const steps = useMemo(
     () =>
@@ -19,9 +19,9 @@ export function CheckoutStepIndicators({ phase }: Props) {
           hint: "Nome, e-mail e CPF",
         },
         {
-          key: "delivery",
+          key: "address",
           title: "Entrega",
-          hint: "Frete grátis Brasil",
+          hint: "Endereço de entrega",
         },
         {
           key: "pay",
@@ -33,11 +33,9 @@ export function CheckoutStepIndicators({ phase }: Props) {
   );
 
   function statusFor(index: number): "done" | "current" | "todo" {
-    if (phase === "payment") {
-      if (index <= 1) return "done";
-      return "current";
-    }
-    if (index === 0) return "current";
+    const currentIndex = phase === "data" ? 0 : phase === "address" ? 1 : 2;
+    if (index < currentIndex) return "done";
+    if (index === currentIndex) return "current";
     return "todo";
   }
 

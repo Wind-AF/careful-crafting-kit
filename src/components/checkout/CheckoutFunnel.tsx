@@ -7,7 +7,7 @@ import {
 } from "@/components/checkout/CheckoutMarketing";
 import type { Offer } from "@/lib/offers";
 
-type Phase = "data" | "payment";
+type Phase = "data" | "address" | "payment";
 
 type Props = {
   offer: Offer;
@@ -71,6 +71,7 @@ export function CheckoutFunnel({
               hasApiKeyConfigured={hasApiKeyConfigured}
               hostedCheckoutUrl={hostedCheckoutUrl}
               variant="embedded"
+              onStepChange={(p) => setPhase(p)}
               onPixReady={() => setPhase("payment")}
             />
           </Suspense>

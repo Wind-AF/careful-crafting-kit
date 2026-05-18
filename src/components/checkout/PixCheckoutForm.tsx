@@ -14,6 +14,8 @@ type Props = {
   variant?: "standalone" | "embedded";
   /** Chamado quando o QR Pix fica disponível (avança etapas visuais). */
   onPixReady?: () => void;
+  /** Notifica o pai sobre a etapa atual (dados → endereço → pagamento). */
+  onStepChange?: (phase: "data" | "address" | "payment") => void;
 };
 
 type PixPayload = {
@@ -29,6 +31,7 @@ export function PixCheckoutForm({
   hostedCheckoutUrl,
   variant = "standalone",
   onPixReady,
+  onStepChange,
 }: Props) {
   const embed = variant === "embedded";
   const tracking = useMemo(() => {
@@ -60,6 +63,7 @@ export function PixCheckoutForm({
   const [pix, setPix] = useState<PixPayload | null>(null);
   const [copied, setCopied] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [step, setStep] = useState<"personal" | "address">("personal");
 
   function formatCpf(v: string) {
     const d = digitsOnly(v).slice(0, 11);
@@ -126,10 +130,30 @@ export function PixCheckoutForm({
   const districtValid = district.trim().length >= 2;
   const cityValid = city.trim().length >= 2;
   const ufValid = /^[A-Za-z]{2}$/.test(uf.trim());
+  const personalValid = nameValid && emailValid && cpfValid && phoneValid;
   const addressValid =
     cepValid && streetValid && numberValid && districtValid && cityValid && ufValid;
-  const formValid =
-    nameValid && emailValid && cpfValid && phoneValid && addressValid;
+  const formValid = personalValid && addressValid;
+
+  function goToAddress() {
+    setError(null);
+    setTouched((t) => ({ ...t, name: true, email: true, phone: true, cpf: true }));
+    if (!personalValid) {
+      if (!nameValid) setError("Informe o nome completo.");
+      else if (!emailValid) setError("E-mail inválido.");
+      else if (!phoneValid) setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+      else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
+      return;
+    }
+    setStep("address");
+    onStepChange?.("address");
+  }
+
+  function backToPersonal() {
+    setError(null);
+    setStep("personal");
+    onStepChange?.("data");
+  }
 
   async function handleCopyPix() {
     if (!pix) return;
@@ -321,23 +345,22 @@ export function PixCheckoutForm({
           : "space-y-4 rounded-xl border border-white/10 bg-gh-surface/80 p-4 sm:p-6"
       }
     >
-      <h2 className="font-display text-xl uppercase text-white sm:text-2xl">
-        Seus dados
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-xl uppercase text-white sm:text-2xl">
+          {step === "personal" ? "Seus dados" : "Endereço de entrega"}
+        </h2>
+        <span className="text-[11px] uppercase tracking-wide text-gh-muted">
+          Passo {step === "personal" ? "1" : "2"} de 3
+        </span>
+      </div>
       <p className="text-sm text-gh-muted">
-        {embed ? (
-          <>
-            Informações para gerar o Pix via{" "}
-            <strong className="text-white/90">Pagou</strong>.
-          </>
+        {step === "personal" ? (
+          <>Preencha seus dados para seguir para o endereço de entrega.</>
         ) : (
-          <>
-            Necessários para emitir o Pix (Pagou v2).{" "}
-            <strong className="text-white">{offer.cashPrice}</strong> ·{" "}
-            {offer.label}
-          </>
+          <>Para onde enviamos seu pedido. Preenchemos automaticamente pelo CEP.</>
         )}
       </p>
+      {step === "personal" ? (<>
       <div>
         <label className="block text-xs uppercase text-gh-muted">
           Nome completo
@@ -415,7 +438,9 @@ export function PixCheckoutForm({
           </p>
         )}
       </div>
+      </>) : null}
 
+      {step === "address" ? (<>
       <div className="border-t border-white/10 pt-5">
         <h3 className="font-display text-base uppercase text-white sm:text-lg">
           Endereço de entrega
@@ -538,22 +563,49 @@ export function PixCheckoutForm({
           ) : null}
         </div>
       </div>
+      </>) : null}
 
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={loading || !formValid}
-        className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {loading ? "Gerando Pix…" : "Gerar QR Pix"}
-      </button>
-      {!formValid ? (
+
+      {step === "personal" ? (
+        <button
+          type="button"
+          onClick={goToAddress}
+          disabled={!personalValid}
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Continuar
+        </button>
+      ) : (
+        <div className="space-y-3">
+          <button
+            type="submit"
+            disabled={loading || !formValid}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Gerando Pix…" : "Gerar QR Pix"}
+          </button>
+          <button
+            type="button"
+            onClick={backToPersonal}
+            className="block w-full text-center text-xs uppercase tracking-wide text-gh-muted underline"
+          >
+            ← Voltar aos dados
+          </button>
+        </div>
+      )}
+      {step === "personal" && !personalValid ? (
         <p className="text-center text-[11px] text-gh-muted">
-          Preencha todos os campos corretamente para liberar o botão.
+          Preencha todos os campos para continuar.
+        </p>
+      ) : null}
+      {step === "address" && !formValid ? (
+        <p className="text-center text-[11px] text-gh-muted">
+          Preencha todos os campos do endereço para gerar o Pix.
         </p>
       ) : null}
     </form>
