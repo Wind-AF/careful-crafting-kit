@@ -31,6 +31,7 @@ export function PixCheckoutForm({
   hostedCheckoutUrl,
   variant = "standalone",
   onPixReady,
+  onStepChange,
 }: Props) {
   const embed = variant === "embedded";
   const tracking = useMemo(() => {
