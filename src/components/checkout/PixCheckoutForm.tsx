@@ -563,22 +563,49 @@ export function PixCheckoutForm({
           ) : null}
         </div>
       </div>
+      </>) : null}
 
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
           {error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={loading || !formValid}
-        className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {loading ? "Gerando Pix…" : "Gerar QR Pix"}
-      </button>
-      {!formValid ? (
+
+      {step === "personal" ? (
+        <button
+          type="button"
+          onClick={goToAddress}
+          disabled={!personalValid}
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Continuar
+        </button>
+      ) : (
+        <div className="space-y-3">
+          <button
+            type="submit"
+            disabled={loading || !formValid}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-gradient-to-b from-gh-gold-bright to-gh-gold py-3 text-center text-base font-bold uppercase text-black disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "Gerando Pix…" : "Gerar QR Pix"}
+          </button>
+          <button
+            type="button"
+            onClick={backToPersonal}
+            className="block w-full text-center text-xs uppercase tracking-wide text-gh-muted underline"
+          >
+            ← Voltar aos dados
+          </button>
+        </div>
+      )}
+      {step === "personal" && !personalValid ? (
         <p className="text-center text-[11px] text-gh-muted">
-          Preencha todos os campos corretamente para liberar o botão.
+          Preencha todos os campos para continuar.
+        </p>
+      ) : null}
+      {step === "address" && !formValid ? (
+        <p className="text-center text-[11px] text-gh-muted">
+          Preencha todos os campos do endereço para gerar o Pix.
         </p>
       ) : null}
     </form>
