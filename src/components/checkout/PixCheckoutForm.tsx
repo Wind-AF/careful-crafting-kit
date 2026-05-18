@@ -63,6 +63,7 @@ export function PixCheckoutForm({
   const [pix, setPix] = useState<PixPayload | null>(null);
   const [copied, setCopied] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [step, setStep] = useState<"personal" | "address">("personal");
 
   function formatCpf(v: string) {
     const d = digitsOnly(v).slice(0, 11);
