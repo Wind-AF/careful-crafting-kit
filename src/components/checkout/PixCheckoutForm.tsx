@@ -415,6 +415,130 @@ export function PixCheckoutForm({
           </p>
         )}
       </div>
+
+      <div className="border-t border-white/10 pt-5">
+        <h3 className="font-display text-base uppercase text-white sm:text-lg">
+          Endereço de entrega
+        </h3>
+        <p className="mt-1 text-xs text-gh-muted">
+          Preenchemos automaticamente após digitar o CEP (via ViaCEP).
+        </p>
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">CEP</label>
+        <input
+          required
+          inputMode="numeric"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={cep}
+          onChange={(e) => {
+            const v = formatCep(e.target.value);
+            setCep(v);
+            if (digitsOnly(v).length === 8) lookupCep(v);
+          }}
+          onBlur={() => {
+            setTouched((t) => ({ ...t, cep: true }));
+            lookupCep(cep);
+          }}
+          autoComplete="postal-code"
+          placeholder="00000-000"
+          maxLength={9}
+        />
+        {cepLoading ? (
+          <p className="mt-1 text-xs text-gh-muted">Buscando CEP…</p>
+        ) : cepError ? (
+          <p className="mt-1 text-xs text-red-300">{cepError}</p>
+        ) : touched.cep && !cepValid ? (
+          <p className="mt-1 text-xs text-red-300">CEP deve ter 8 dígitos.</p>
+        ) : null}
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">Logradouro</label>
+        <input
+          required
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={street}
+          onChange={(e) => setStreet(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, street: true }))}
+          autoComplete="address-line1"
+          placeholder="Rua, Avenida…"
+        />
+        {touched.street && !streetValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe o logradouro.</p>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-1">
+          <label className="block text-xs uppercase text-gh-muted">Número</label>
+          <input
+            required
+            inputMode="numeric"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, number: true }))}
+            placeholder="123"
+          />
+          {touched.number && !numberValid ? (
+            <p className="mt-1 text-xs text-red-300">Obrigatório.</p>
+          ) : null}
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs uppercase text-gh-muted">Complemento</label>
+          <input
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={complement}
+            onChange={(e) => setComplement(e.target.value)}
+            autoComplete="address-line2"
+            placeholder="Apto, bloco… (opcional)"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">Bairro</label>
+        <input
+          required
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, district: true }))}
+        />
+        {touched.district && !districtValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe o bairro.</p>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-4 gap-3">
+        <div className="col-span-3">
+          <label className="block text-xs uppercase text-gh-muted">Cidade</label>
+          <input
+            required
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, city: true }))}
+            autoComplete="address-level2"
+          />
+          {touched.city && !cityValid ? (
+            <p className="mt-1 text-xs text-red-300">Informe a cidade.</p>
+          ) : null}
+        </div>
+        <div className="col-span-1">
+          <label className="block text-xs uppercase text-gh-muted">UF</label>
+          <input
+            required
+            maxLength={2}
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base uppercase text-gh-text"
+            value={uf}
+            onChange={(e) => setUf(e.target.value.toUpperCase().slice(0, 2))}
+            onBlur={() => setTouched((t) => ({ ...t, uf: true }))}
+            autoComplete="address-level1"
+          />
+          {touched.uf && !ufValid ? (
+            <p className="mt-1 text-xs text-red-300">UF 2 letras.</p>
+          ) : null}
+        </div>
+      </div>
+
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
           {error}
