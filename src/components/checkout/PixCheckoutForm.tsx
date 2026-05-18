@@ -130,10 +130,30 @@ export function PixCheckoutForm({
   const districtValid = district.trim().length >= 2;
   const cityValid = city.trim().length >= 2;
   const ufValid = /^[A-Za-z]{2}$/.test(uf.trim());
+  const personalValid = nameValid && emailValid && cpfValid && phoneValid;
   const addressValid =
     cepValid && streetValid && numberValid && districtValid && cityValid && ufValid;
-  const formValid =
-    nameValid && emailValid && cpfValid && phoneValid && addressValid;
+  const formValid = personalValid && addressValid;
+
+  function goToAddress() {
+    setError(null);
+    setTouched((t) => ({ ...t, name: true, email: true, phone: true, cpf: true }));
+    if (!personalValid) {
+      if (!nameValid) setError("Informe o nome completo.");
+      else if (!emailValid) setError("E-mail inválido.");
+      else if (!phoneValid) setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+      else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
+      return;
+    }
+    setStep("address");
+    onStepChange?.("address");
+  }
+
+  function backToPersonal() {
+    setError(null);
+    setStep("personal");
+    onStepChange?.("data");
+  }
 
   async function handleCopyPix() {
     if (!pix) return;
