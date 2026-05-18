@@ -40,6 +40,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
           email?: string;
           document?: string;
           phone?: string;
+          address?: Record<string, unknown>;
         };
         const tracking = parseTrackingFromRequestBody(b);
 
@@ -67,6 +68,35 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
             { status: 400 },
           );
         }
+
+        const a = b.address ?? {};
+        const addrCep = digitsOnly(String((a as Record<string, unknown>).cep ?? ""));
+        const addrStreet = String((a as Record<string, unknown>).street ?? "").trim();
+        const addrNumber = String((a as Record<string, unknown>).number ?? "").trim();
+        const addrComplement = String((a as Record<string, unknown>).complement ?? "").trim();
+        const addrDistrict = String((a as Record<string, unknown>).district ?? "").trim();
+        const addrCity = String((a as Record<string, unknown>).city ?? "").trim();
+        const addrUf = String((a as Record<string, unknown>).uf ?? "").trim().toUpperCase();
+        if (
+          addrCep.length !== 8 ||
+          addrStreet.length < 3 || addrStreet.length > 200 ||
+          addrNumber.length < 1 || addrNumber.length > 20 ||
+          addrComplement.length > 100 ||
+          addrDistrict.length < 2 || addrDistrict.length > 100 ||
+          addrCity.length < 2 || addrCity.length > 100 ||
+          !/^[A-Z]{2}$/.test(addrUf)
+        ) {
+          return Response.json({ error: "Endereço de entrega inválido" }, { status: 400 });
+        }
+        const address = {
+          cep: addrCep,
+          street: addrStreet,
+          number: addrNumber,
+          ...(addrComplement ? { complement: addrComplement } : {}),
+          district: addrDistrict,
+          city: addrCity,
+          uf: addrUf,
+        };
 
         const offer = getOfferByUnits(b.units);
         if (!offer) {
@@ -118,6 +148,7 @@ export const Route = createFileRoute("/api/pagou/create-pix")({
               name,
               amountCents: offer.amountCents,
               createdAt: new Date().toISOString(),
+              address,
               ...(tracking ? { tracking } : {}),
             });
           } catch (persistErr) {

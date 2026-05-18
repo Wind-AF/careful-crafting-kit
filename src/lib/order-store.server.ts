@@ -21,6 +21,16 @@ export type StoredOrder = {
   lastWebhookEventId?: string;
   /** Parâmetros da URL de campanha (ex.: click_id, sid, fbclid). */
   tracking?: Record<string, string>;
+  /** Endereço de entrega coletado no checkout. */
+  address?: {
+    cep: string;
+    street: string;
+    number: string;
+    complement?: string;
+    district: string;
+    city: string;
+    uf: string;
+  };
 };
 
 const TTL_PENDING_SEC = 60 * 60 * 24 * 14;

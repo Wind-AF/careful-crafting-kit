@@ -46,6 +46,15 @@ export function PixCheckoutForm({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [cpfInput, setCpfInput] = useState("");
+  const [cep, setCep] = useState("");
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [uf, setUf] = useState("");
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixPayload | null>(null);
@@ -60,6 +69,41 @@ export function PixCheckoutForm({
       .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
   }
 
+  function formatCep(v: string) {
+    const d = digitsOnly(v).slice(0, 8);
+    if (d.length <= 5) return d;
+    return `${d.slice(0, 5)}-${d.slice(5)}`;
+  }
+
+  async function lookupCep(value: string) {
+    const d = digitsOnly(value);
+    if (d.length !== 8) return;
+    setCepLoading(true);
+    setCepError(null);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+      const data = (await res.json()) as {
+        erro?: boolean;
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+      };
+      if (data.erro) {
+        setCepError("CEP não encontrado.");
+        return;
+      }
+      setStreet(data.logradouro ?? "");
+      setDistrict(data.bairro ?? "");
+      setCity(data.localidade ?? "");
+      setUf((data.uf ?? "").toUpperCase());
+    } catch {
+      setCepError("Não foi possível buscar o CEP. Preencha manualmente.");
+    } finally {
+      setCepLoading(false);
+    }
+  }
+
   function formatPhone(v: string) {
     const d = digitsOnly(v).slice(0, 11);
     if (d.length <= 2) return d.length ? `(${d}` : d;
@@ -71,11 +115,21 @@ export function PixCheckoutForm({
 
   const cpfDigits = digitsOnly(cpfInput);
   const phoneDigits = digitsOnly(phone);
+  const cepDigits = digitsOnly(cep);
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const nameValid = name.trim().length >= 3;
   const cpfValid = cpfDigits.length === 11 && isValidCPFDigits(cpfDigits);
   const phoneValid = phoneDigits.length === 10 || phoneDigits.length === 11;
-  const formValid = nameValid && emailValid && cpfValid && phoneValid;
+  const cepValid = cepDigits.length === 8;
+  const streetValid = street.trim().length >= 3;
+  const numberValid = number.trim().length >= 1;
+  const districtValid = district.trim().length >= 2;
+  const cityValid = city.trim().length >= 2;
+  const ufValid = /^[A-Za-z]{2}$/.test(uf.trim());
+  const addressValid =
+    cepValid && streetValid && numberValid && districtValid && cityValid && ufValid;
+  const formValid =
+    nameValid && emailValid && cpfValid && phoneValid && addressValid;
 
   async function handleCopyPix() {
     if (!pix) return;
@@ -97,13 +151,22 @@ export function PixCheckoutForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setTouched({ name: true, email: true, cpf: true, phone: true });
+    setTouched({
+      name: true, email: true, cpf: true, phone: true,
+      cep: true, street: true, number: true, district: true, city: true, uf: true,
+    });
     if (!formValid) {
       if (!nameValid) setError("Informe o nome completo.");
       else if (!emailValid) setError("E-mail inválido.");
       else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
       else if (!phoneValid)
         setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+      else if (!cepValid) setError("Informe um CEP válido (8 dígitos).");
+      else if (!streetValid) setError("Informe o logradouro.");
+      else if (!numberValid) setError("Informe o número.");
+      else if (!districtValid) setError("Informe o bairro.");
+      else if (!cityValid) setError("Informe a cidade.");
+      else if (!ufValid) setError("UF deve ter 2 letras.");
       return;
     }
     setLoading(true);
@@ -117,6 +180,15 @@ export function PixCheckoutForm({
           email: email.trim(),
           document: cpfDigits,
           phone: phoneDigits,
+          address: {
+            cep: cepDigits,
+            street: street.trim(),
+            number: number.trim(),
+            complement: complement.trim() || undefined,
+            district: district.trim(),
+            city: city.trim(),
+            uf: uf.trim().toUpperCase(),
+          },
           ...(tracking ? { tracking } : {}),
         }),
       });
@@ -343,6 +415,130 @@ export function PixCheckoutForm({
           </p>
         )}
       </div>
+
+      <div className="border-t border-white/10 pt-5">
+        <h3 className="font-display text-base uppercase text-white sm:text-lg">
+          Endereço de entrega
+        </h3>
+        <p className="mt-1 text-xs text-gh-muted">
+          Preenchemos automaticamente após digitar o CEP (via ViaCEP).
+        </p>
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">CEP</label>
+        <input
+          required
+          inputMode="numeric"
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={cep}
+          onChange={(e) => {
+            const v = formatCep(e.target.value);
+            setCep(v);
+            if (digitsOnly(v).length === 8) lookupCep(v);
+          }}
+          onBlur={() => {
+            setTouched((t) => ({ ...t, cep: true }));
+            lookupCep(cep);
+          }}
+          autoComplete="postal-code"
+          placeholder="00000-000"
+          maxLength={9}
+        />
+        {cepLoading ? (
+          <p className="mt-1 text-xs text-gh-muted">Buscando CEP…</p>
+        ) : cepError ? (
+          <p className="mt-1 text-xs text-red-300">{cepError}</p>
+        ) : touched.cep && !cepValid ? (
+          <p className="mt-1 text-xs text-red-300">CEP deve ter 8 dígitos.</p>
+        ) : null}
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">Logradouro</label>
+        <input
+          required
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={street}
+          onChange={(e) => setStreet(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, street: true }))}
+          autoComplete="address-line1"
+          placeholder="Rua, Avenida…"
+        />
+        {touched.street && !streetValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe o logradouro.</p>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-1">
+          <label className="block text-xs uppercase text-gh-muted">Número</label>
+          <input
+            required
+            inputMode="numeric"
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, number: true }))}
+            placeholder="123"
+          />
+          {touched.number && !numberValid ? (
+            <p className="mt-1 text-xs text-red-300">Obrigatório.</p>
+          ) : null}
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs uppercase text-gh-muted">Complemento</label>
+          <input
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={complement}
+            onChange={(e) => setComplement(e.target.value)}
+            autoComplete="address-line2"
+            placeholder="Apto, bloco… (opcional)"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs uppercase text-gh-muted">Bairro</label>
+        <input
+          required
+          className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          onBlur={() => setTouched((t) => ({ ...t, district: true }))}
+        />
+        {touched.district && !districtValid ? (
+          <p className="mt-1 text-xs text-red-300">Informe o bairro.</p>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-4 gap-3">
+        <div className="col-span-3">
+          <label className="block text-xs uppercase text-gh-muted">Cidade</label>
+          <input
+            required
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base text-gh-text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, city: true }))}
+            autoComplete="address-level2"
+          />
+          {touched.city && !cityValid ? (
+            <p className="mt-1 text-xs text-red-300">Informe a cidade.</p>
+          ) : null}
+        </div>
+        <div className="col-span-1">
+          <label className="block text-xs uppercase text-gh-muted">UF</label>
+          <input
+            required
+            maxLength={2}
+            className="mt-1 w-full rounded border border-white/20 bg-black/40 px-3 py-3 text-base uppercase text-gh-text"
+            value={uf}
+            onChange={(e) => setUf(e.target.value.toUpperCase().slice(0, 2))}
+            onBlur={() => setTouched((t) => ({ ...t, uf: true }))}
+            autoComplete="address-level1"
+          />
+          {touched.uf && !ufValid ? (
+            <p className="mt-1 text-xs text-red-300">UF 2 letras.</p>
+          ) : null}
+        </div>
+      </div>
+
       {error ? (
         <p className="rounded bg-red-950/50 px-3 py-2 text-sm text-red-200">
           {error}
