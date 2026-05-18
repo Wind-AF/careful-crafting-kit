@@ -7,7 +7,7 @@ import {
 } from "@/components/checkout/CheckoutMarketing";
 import type { Offer } from "@/lib/offers";
 
-type Phase = "data" | "payment";
+type Phase = "data" | "address" | "payment";
 
 type Props = {
   offer: Offer;
