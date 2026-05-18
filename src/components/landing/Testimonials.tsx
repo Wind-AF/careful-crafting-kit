@@ -1,49 +1,50 @@
 import { SectionTitle } from "./SectionTitle";
+import cliente1 from "@/assets/cliente-1.jpeg";
+import cliente2 from "@/assets/cliente-2.jpeg";
+import cliente3 from "@/assets/cliente-3.jpeg";
+import cliente4 from "@/assets/cliente-4.jpeg";
+import cliente5 from "@/assets/cliente-5.jpeg";
 
-/**
- * Fotos do carrossel «Quem usa aprova!» na página oficial de referência:
- * https://ghmuscle.com.br/ghdrol/
- */
 const DEPOIMENTOS = [
   {
-    src: "https://ghmuscle.com.br/wp-content/uploads/2026/03/1.png",
-    alt: "Rafael — cliente que usa GHDROL",
-    name: "Rafael T.",
-    cidade: "Curitiba · PR",
+    src: cliente1,
+    alt: "Patrícia — cliente que usa GHDROL",
+    name: "Patrícia M.",
+    cidade: "Florianópolis · SC",
     quote:
-      "Há três semanas na rotina certinha: mais disposição no treino e foco no trampo. O pump ficou bem mais consistente.",
+      "Em poucas semanas já notei mais disposição no dia a dia e treinos bem mais consistentes. Adorei a praticidade.",
   },
   {
-    src: "https://ghmuscle.com.br/wp-content/uploads/2025/05/2-4.png",
-    alt: "Lucas — cliente que usa GHDROL",
-    name: "Lucas M.",
+    src: cliente2,
+    alt: "Juliana — cliente que usa GHDROL",
+    name: "Juliana R.",
     cidade: "Belo Horizonte · MG",
     quote:
-      "Eu era bem cético com GH em cápsula, mas senti recuperação melhor já nas primeiras semanas. Até durmo mais tranquilo.",
+      "Eu estava cética, mas a recuperação melhorou e até durmo mais tranquila. Cabe certinho na minha rotina corrida.",
   },
   {
-    src: "https://ghmuscle.com.br/wp-content/uploads/2026/03/2.png",
-    alt: "Diego — cliente que usa GHDROL",
-    name: "Diego P.",
-    cidade: "Porto Alegre · RS",
+    src: cliente3,
+    alt: "Camila — cliente que usa GHDROL",
+    name: "Camila S.",
+    cidade: "Curitiba · PR",
     quote:
-      "Peguei o kit maior pela promoção. Chegou rápido e o pessoal do WhatsApp me respondeu na hora.",
+      "Peguei o kit maior pela promoção. Chegou rápido e o atendimento no WhatsApp respondeu na hora.",
   },
   {
-    src: "https://ghmuscle.com.br/wp-content/uploads/2025/05/4-4.png",
-    alt: "André — cliente que usa GHDROL",
-    name: "André L.",
+    src: cliente4,
+    alt: "Ricardo — cliente que usa GHDROL",
+    name: "Ricardo A.",
     cidade: "São Paulo · SP",
     quote:
       "Não é mágica — continuo treinando pesado — mas a energia no dia a dia eu notei já na primeira caixa.",
   },
   {
-    src: "https://ghmuscle.com.br/wp-content/uploads/2025/05/5-1.png",
-    alt: "Camila — cliente que usa GHDROL",
-    name: "Camila R.",
-    cidade: "Florianópolis · SC",
+    src: cliente5,
+    alt: "Diego — cliente que usa GHDROL",
+    name: "Diego P.",
+    cidade: "Porto Alegre · RS",
     quote:
-      "Estou satisfeita com a praticidade: uma dose única e cabe na minha rotina corrida. Sinto menos cansaço quando chego na segunda série dos exercícios grandes.",
+      "Pump muito mais consistente e foco no trampo. Em três semanas o ganho de força ficou nítido.",
   },
 ] as const;
 
