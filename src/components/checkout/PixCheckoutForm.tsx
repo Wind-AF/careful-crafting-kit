@@ -438,7 +438,9 @@ export function PixCheckoutForm({
           </p>
         )}
       </div>
+      </>) : null}
 
+      {step === "address" ? (<>
       <div className="border-t border-white/10 pt-5">
         <h3 className="font-display text-base uppercase text-white sm:text-lg">
           Endereço de entrega
