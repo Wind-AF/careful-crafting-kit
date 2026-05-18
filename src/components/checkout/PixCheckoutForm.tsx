@@ -46,6 +46,15 @@ export function PixCheckoutForm({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [cpfInput, setCpfInput] = useState("");
+  const [cep, setCep] = useState("");
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [uf, setUf] = useState("");
+  const [cepLoading, setCepLoading] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixPayload | null>(null);
@@ -60,6 +69,41 @@ export function PixCheckoutForm({
       .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
   }
 
+  function formatCep(v: string) {
+    const d = digitsOnly(v).slice(0, 8);
+    if (d.length <= 5) return d;
+    return `${d.slice(0, 5)}-${d.slice(5)}`;
+  }
+
+  async function lookupCep(value: string) {
+    const d = digitsOnly(value);
+    if (d.length !== 8) return;
+    setCepLoading(true);
+    setCepError(null);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+      const data = (await res.json()) as {
+        erro?: boolean;
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+      };
+      if (data.erro) {
+        setCepError("CEP não encontrado.");
+        return;
+      }
+      setStreet(data.logradouro ?? "");
+      setDistrict(data.bairro ?? "");
+      setCity(data.localidade ?? "");
+      setUf((data.uf ?? "").toUpperCase());
+    } catch {
+      setCepError("Não foi possível buscar o CEP. Preencha manualmente.");
+    } finally {
+      setCepLoading(false);
+    }
+  }
+
   function formatPhone(v: string) {
     const d = digitsOnly(v).slice(0, 11);
     if (d.length <= 2) return d.length ? `(${d}` : d;
@@ -71,11 +115,21 @@ export function PixCheckoutForm({
 
   const cpfDigits = digitsOnly(cpfInput);
   const phoneDigits = digitsOnly(phone);
+  const cepDigits = digitsOnly(cep);
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const nameValid = name.trim().length >= 3;
   const cpfValid = cpfDigits.length === 11 && isValidCPFDigits(cpfDigits);
   const phoneValid = phoneDigits.length === 10 || phoneDigits.length === 11;
-  const formValid = nameValid && emailValid && cpfValid && phoneValid;
+  const cepValid = cepDigits.length === 8;
+  const streetValid = street.trim().length >= 3;
+  const numberValid = number.trim().length >= 1;
+  const districtValid = district.trim().length >= 2;
+  const cityValid = city.trim().length >= 2;
+  const ufValid = /^[A-Za-z]{2}$/.test(uf.trim());
+  const addressValid =
+    cepValid && streetValid && numberValid && districtValid && cityValid && ufValid;
+  const formValid =
+    nameValid && emailValid && cpfValid && phoneValid && addressValid;
 
   async function handleCopyPix() {
     if (!pix) return;
