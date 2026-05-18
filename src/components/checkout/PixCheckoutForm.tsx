@@ -14,6 +14,8 @@ type Props = {
   variant?: "standalone" | "embedded";
   /** Chamado quando o QR Pix fica disponível (avança etapas visuais). */
   onPixReady?: () => void;
+  /** Notifica o pai sobre a etapa atual (dados → endereço → pagamento). */
+  onStepChange?: (phase: "data" | "address" | "payment") => void;
 };
 
 type PixPayload = {
