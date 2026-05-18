@@ -1,5 +1,4 @@
 import { SalesAssistantChat } from "@/components/landing/SalesAssistantChat";
-import { WHATSAPP_SUPPORT_URL } from "@/lib/whatsapp-support";
 
 export function SiteFooter() {
   return (
@@ -9,25 +8,10 @@ export function SiteFooter() {
           Dúvidas?
         </h3>
         <p className="mx-auto mt-3 max-w-xl text-balance">
-          Primeiro use o assistente abaixo — as respostas são as mesmas desta página.
-          Depois, se quiser, fale com nosso suporte pelo WhatsApp.
+          Use o assistente abaixo — as respostas são as mesmas desta página.
         </p>
         <SalesAssistantChat />
-        <a
-          href={WHATSAPP_SUPPORT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex rounded-md border border-green-500/50 bg-green-600/20 px-6 py-3 font-semibold text-green-300 transition hover:bg-green-600/30"
-        >
-          Tirar dúvidas pelo WhatsApp
-        </a>
-        <p className="mt-8 text-xs">
-          Central de atendimento · Telefone{" "}
-          <a href="tel:+5551982172731" className="text-gh-gold underline">
-            (51) 98217-2731
-          </a>
-        </p>
-        <p className="mt-6 border-t border-white/10 pt-6 text-xs">
+        <p className="mt-8 border-t border-white/10 pt-6 text-xs">
           Copyright {new Date().getFullYear()} © GHMUSCLE — Todos os direitos
           reservados — CNPJ 43.874.370/0001-60
         </p>
