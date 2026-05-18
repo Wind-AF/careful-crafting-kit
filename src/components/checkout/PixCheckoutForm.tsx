@@ -151,13 +151,22 @@ export function PixCheckoutForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setTouched({ name: true, email: true, cpf: true, phone: true });
+    setTouched({
+      name: true, email: true, cpf: true, phone: true,
+      cep: true, street: true, number: true, district: true, city: true, uf: true,
+    });
     if (!formValid) {
       if (!nameValid) setError("Informe o nome completo.");
       else if (!emailValid) setError("E-mail inválido.");
       else if (!cpfValid) setError("CPF inválido — confira os 11 dígitos.");
       else if (!phoneValid)
         setError("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+      else if (!cepValid) setError("Informe um CEP válido (8 dígitos).");
+      else if (!streetValid) setError("Informe o logradouro.");
+      else if (!numberValid) setError("Informe o número.");
+      else if (!districtValid) setError("Informe o bairro.");
+      else if (!cityValid) setError("Informe a cidade.");
+      else if (!ufValid) setError("UF deve ter 2 letras.");
       return;
     }
     setLoading(true);
@@ -171,6 +180,15 @@ export function PixCheckoutForm({
           email: email.trim(),
           document: cpfDigits,
           phone: phoneDigits,
+          address: {
+            cep: cepDigits,
+            street: street.trim(),
+            number: number.trim(),
+            complement: complement.trim() || undefined,
+            district: district.trim(),
+            city: city.trim(),
+            uf: uf.trim().toUpperCase(),
+          },
           ...(tracking ? { tracking } : {}),
         }),
       });
