@@ -345,23 +345,22 @@ export function PixCheckoutForm({
           : "space-y-4 rounded-xl border border-white/10 bg-gh-surface/80 p-4 sm:p-6"
       }
     >
-      <h2 className="font-display text-xl uppercase text-white sm:text-2xl">
-        Seus dados
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-xl uppercase text-white sm:text-2xl">
+          {step === "personal" ? "Seus dados" : "Endereço de entrega"}
+        </h2>
+        <span className="text-[11px] uppercase tracking-wide text-gh-muted">
+          Passo {step === "personal" ? "1" : "2"} de 3
+        </span>
+      </div>
       <p className="text-sm text-gh-muted">
-        {embed ? (
-          <>
-            Informações para gerar o Pix via{" "}
-            <strong className="text-white/90">Pagou</strong>.
-          </>
+        {step === "personal" ? (
+          <>Preencha seus dados para seguir para o endereço de entrega.</>
         ) : (
-          <>
-            Necessários para emitir o Pix (Pagou v2).{" "}
-            <strong className="text-white">{offer.cashPrice}</strong> ·{" "}
-            {offer.label}
-          </>
+          <>Para onde enviamos seu pedido. Preenchemos automaticamente pelo CEP.</>
         )}
       </p>
+      {step === "personal" ? (<>
       <div>
         <label className="block text-xs uppercase text-gh-muted">
           Nome completo
