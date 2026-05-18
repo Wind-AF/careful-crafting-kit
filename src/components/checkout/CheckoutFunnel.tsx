@@ -71,6 +71,7 @@ export function CheckoutFunnel({
               hasApiKeyConfigured={hasApiKeyConfigured}
               hostedCheckoutUrl={hostedCheckoutUrl}
               variant="embedded"
+              onStepChange={(p) => setPhase(p)}
               onPixReady={() => setPhase("payment")}
             />
           </Suspense>
